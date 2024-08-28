@@ -32,5 +32,9 @@ peerServer.on('connection', (client) => {
   console.log('A peer connected:', client.getId());
 });
 
+peerServer.on("disconnect", (client) => {
+	console.log('A peer disconnected:', client.getId());
+})
+
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
