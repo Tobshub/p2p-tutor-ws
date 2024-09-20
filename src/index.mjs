@@ -3,10 +3,11 @@ import express from "express";
 import { Server } from "socket.io";
 import { ExpressPeerServer } from "peer";
 import cors from "cors";
+import { RegisterEvents } from "./events.mjs";
 
 const app = express();
 const server = createServer(app);
-const io = Server(server);
+const io = new Server(server);
 
 const peerServer = ExpressPeerServer(server, { debug: true, path: "/" });
 
@@ -15,14 +16,7 @@ app.use("/peerjs", peerServer);
 app.get("/ping", (_, res) => res.send("pong"));
 
 io.on("connection", (socket) => {
-  socket.on("join-room", (roomId, userId) => {
-    socket.join(roomId);
-    socket.to(roomId).emit("user-connected", userId);
-
-    socket.on("disconnect", () => {
-      socket.to(roomId).emit("user-disconnected", userId);
-    });
-  });
+	RegisterEvents(socket);
 });
 
 // PeerJS server events (if needed)
