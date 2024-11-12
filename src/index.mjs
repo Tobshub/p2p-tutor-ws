@@ -7,16 +7,17 @@ import { RegisterEvents } from "./events.mjs";
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, { cors: { origin: "*" } });
 
 const peerServer = ExpressPeerServer(server, { debug: true, path: "/" });
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use("/peerjs", peerServer);
 app.get("/ping", (_, res) => res.send("pong"));
 
 io.on("connection", (socket) => {
-	RegisterEvents(socket);
+  console.log("A user connected:", socket.id);
+  RegisterEvents(io, socket);
 });
 
 // PeerJS server events (if needed)

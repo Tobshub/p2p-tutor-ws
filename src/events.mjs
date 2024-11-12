@@ -1,17 +1,22 @@
 const events = {
-	"conv:join": (socket, convId) => {
+	"conv:join": (_, socket, convId) => {
 		socket.join(convId);
 	},
-	"conv:leave": (socket, convId) => {
+	"conv:leave": (_, socket, convId) => {
 		socket.leave(convId);
 	},
-	"conv:message:new": (socket, convId, message) => {
-		socket.to(convId).emit("conv:message:new", message);
+  /** @param {import("socket.io").Socket} io */
+	"conv:message:new": async (_, socket, convId, message) => {
+    console.log({ convId, message });
+    socket.to(convId).emit("conv:message:receive", message);
 	},
 };
 
-export function RegisterEvents(socket) {
+export function RegisterEvents(io, socket) {
   for (const key in events) {
-    socket.on(key, (...args) => events[key](socket, ...args));
+    socket.on(key, (...args) => {
+      console.log("RECEIVED:", key);
+      return events[key](io, socket, ...args)
+    });
   }
 }
